@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+<title>Free Code Camp Url Shortener</title>
+
+<link href="https://fonts.googleapis.com/css?family=Indie+Flower" rel="stylesheet">
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/mycss.css" type="text/css" />
+</head>
+<div id="big">
+<h2>My Frecodecamp Exercise Tracker</h2>
+<div id="bottom">
+<section>
+<p>/api/exercise/new-user</p>
+<form class="myColor" id="spacer" method="post" action="/api/exercise/new-user">
+    <input id="space" placeholder="Please enter your name" type="text" name="user[myName]">
+    <input class="btn btn-primary" type="submit" value="New User">
+</form>
+</section>
+
+<section>
+<p>/api/exercise/add</p>
+<form class="myColor" action="/api/exercise/add" method="post">
+    <input id="space" placeholder="Enter Id here" type="text" name="user[userId]">
+	
+	<input id="space" placeholder="Enter description here" type="text" name="user[userTask]">
+	
+    <input id="space" placeholder="Enter time period here" type="text" name="user[userDuration]">
+	
+	<input id="space" id="space" placeholder="Enter date to start here (yyyy-mm-dd)" type="text" name="user[userDate]">
+
+    <input class="btn btn-primary" type="submit" value="submit"></input>
+</form>
+</section>
+</div>
+
+<h3>User Stories</h3>
+<ul>
+<li>I can create a user by posting form data username to /api/exercise/new-user and returned will be an object with username and _id.</li>
+<li>I can get an array of all users by getting api/exercise/users with the same info as when creating a user.</li>
+<li>I can add an exercise to any user by posting form data userId(_id), description, duration, and optionally date to /api/exercise/add. If no date supplied it will use current date. Returned will the the user object with also with the exercise fields added.</li>
+<li>I can retrieve a full exercise log of any user by getting /api/exercise/log with a parameter of userId(_id). Return will be the user object with added array log and count (total exercise count).</li>
+<li>I can retrieve part of the log of any user by also passing along optional parameters of from & to or limit. (Date format yyyy-mm-dd, limit = int)</li>
+</ul>
+GET users's exercise log: <h4>GET /api/exercise/log?{id}[&start][&end][&limit]</h4>
+
+{ } = required, [ ] = optional
+
+from, to = dates (yyyy-mm-dd); limit = number
+</div>
+<footer>Courtesy A Pretorius &copy; 2018</footer>
+</body>
+</html>

@@ -133,6 +133,20 @@ app.get('/api/exercise/log',(req,res)=>{
 	  array.find( 
   {date: {$gte: new Date(req.query.start), $lt: new Date(req.query.end)}})
   }).limit(req.query.limit).then(data =>{
+	  if(req.query.start === undefined && req.query.end === undefined && req.query.limit === undefined && req.query.id !== undefined){
+		let myLength = data.description.length;
+		return res.send({
+		       count:myLength,
+		       username:data.username,
+			   _id:data._id,
+			   data:[
+                {   
+                 description:data.description,
+                 duration:data.duration
+                 }
+				     ]
+	           })
+	  }
 	  let items; 	  
 	  let myLength = data.description.length;
 	  let item = data.description
@@ -163,6 +177,7 @@ app.get('/api/exercise/log',(req,res)=>{
   }).catch(err =>{
 	  if(err)throw err;
   }) 
+  
 })
 
 app.use('*',(req, res, next)=> {
