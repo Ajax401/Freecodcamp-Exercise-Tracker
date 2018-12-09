@@ -152,9 +152,9 @@ app.get('/api/exercise/log',(req,res)=>{
 	  let item = data.description
 	  let time = data.duration;
 	  let timeperiod;
-	  if(item.length > req.query.limit && time.length > req.query.limit&& myLength !== req.query.limit){
+	  if(item.length >= req.query.limit && time.length >= req.query.limit&& myLength !== req.query.limit){
 	  items = item.slice(0,req.query.limit);
-      timeperiod = 	time.slice(0,req.query.limit); 
+      timeperiod = time.slice(0,req.query.limit); 
       myLength = Number(req.query.limit);	  
 	  }else{
 		return  res.send({error:"Document do not match limit requested"})
@@ -193,5 +193,6 @@ app.use((err, req, res, next)=> {
 app.listen(port,function(){
     console.log('I am working fine!');
 })
-	
+
+//https://happycoder.herokuapp.com	
 //https://devcenter.heroku.com/changelog-items/1530
