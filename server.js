@@ -1,4 +1,3 @@
-
 const express = require("express");
 const port = process.env.PORT || 3000;
 const app = express();
@@ -9,7 +8,8 @@ require('dotenv').config({path:'./Secret/.env/'});
 const Schema = mongoose.Schema;
 
 const shortid = require('shortid');
-
+const moment = require('moment');
+moment().format();
 
 mongoose.connect(process.env.MONGO_URI||'mongodb://localhost/arrays',{ useNewUrlParser: true },(err) =>{
     if (err) throw "Erorr connecting to database" + err;
@@ -24,11 +24,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/',express.static('public'));
 
-		
-app.post('/api/exercise/new-user', function(req, res){
+app.post('/api/exercise/new-user',(req, res)=>{
 	  let myTest = req.body.user.myName;
 	  let testing = /^[a-zA-Z\s]*$/
-	  if(testing.test(myTest) === true){
+	  if(testing.test(myTest) === true && myTest !== ""){
 		 
         array.find({username:req.body.user.myName})	
        .then(user => {
@@ -71,113 +70,119 @@ app.post('/api/exercise/add',(req,res)=>{
 	let myTest = req.body.user.userTask;
 	const testing = /^[a-zA-Z\s]*$/
 	const myNum =  /^\d+$/;
-	const space = /^\s+$/;
+	let checkDate;
 	const checker = /^[0-9-]*$/
 	let checking = req.body.user.userDuration;
-	let dateTrue = req.body.user.userDate;
+	
 	array.countDocuments({_id:req.body.user.userId},(err, count)=>{
-	
-	if(count>0){	
-	if(testing.test(myTest) === true&&myTest !== ""){
-	if(myNum.test(checking)=== true){
-	
-	array.findOneAndUpdate({_id:req.body.user.userId},{ $push :{ description : req.body.user.userTask,   duration :req.body.user.userDuration}},{upsert:true}).then((data)=>{
-	    let date = new Date().toString();
-		  if(Object.keys(req.body.user.userDate).length === 0){
-			  
-		res.send({ 
+	if(count>0){
+		if(testing.test(myTest) === true && myTest !== ""){
+			if(myNum.test(checking)=== true){
+				let inPutDate;
+		        let timestamp;
+		        let d;
+			 if(Object.keys(req.body.user.userDate).length === 0){
+				 let date1 = Date.now();
+		         date1 = new Date(date1);
+                 date1.setUTCHours(0,0,0,0);
+				array.findOneAndUpdate({_id:req.body.user.userId},{ $push :{data:{ description : req.body.user.userTask, duration :Number(req.body.user.userDuration),date:date1}}},{new:true}).then((data)=>{
+				   date1 = new Date(date1).toDateString();
+				   console.log(data)
+				   res.send({ 
 		           username:data.username,
-		           date:date.substr(0,16),
+		           date:date1,
 		           description:req.body.user.userTask,
-			       duration:req.body.user.userDuration,
-			       _id:req.body.user.userId,})
-	    }else{
-		 res.send({
-			        username:data.username,
-		            date:req.body.user.userDate,
-		            description:req.body.user.userTask,
-					duration:req.body.user.userDuration,
-					_id:data._id,
-					
-		            });
-	}
-		 	
-	}).catch(err => {
+			       duration:Number(req.body.user.userDuration),
+			       _id:req.body.user.userId
+				   })
+				}).catch(err => {
  
          if(err) throw err;
   
-    });
-	
-	}else{
+    });	
+			 }else{
+				 timestamp = new Date(req.body.user.userDate);
+				 d = moment(timestamp).format("YYYY-MM-DDT00:00:00.000") + "Z";
+				 inPutDate = new Date(d);
+				 let checking = d;
+				 console.log(inPutDate)
+				 console.log(typeof(inPutDate))
+				 checkDate = moment(inPutDate);
+				 if(checkDate.isValid() === true){
+					  
+		  array.findOneAndUpdate({_id:req.body.user.userId},{ $push :{data:{ description : req.body.user.userTask, duration :Number(req.body.user.userDuration),date:inPutDate}}},{new:true}).then((data)=>{
+				   inPutDate = new Date(inPutDate).toDateString();
+				   console.log(data)
+				   res.send({ 
+		           username:data.username,
+		           date:inPutDate,
+		           description:req.body.user.userTask,
+			       duration:Number(req.body.user.userDuration),
+			       _id:req.body.user.userId
+				   })
+				}).catch(err => {
+ 
+         if(err) throw err;
+        
+    });	
+		  
+			 }else{
+					 res.send({error:"Invalid date Format. Please use following types 2019-01-01 , 1 January 2019 or 2019/01/01"})
+			 }  
+		  
+			 }
+				}else{
 		res.send({duration:"Please type a number value"})
 	}	
-	}else{
+			}else{
 		res.send({description:"Invalid description! Please enter a string of letters for description."})  
 	  }
-	}else{
+		}else{
 			  res.send({_id:"Please type correct id from datbase"})
 		  }
-	}); 
+	}); 	
 })
 
 app.get('/api/exercise/users',(req, res)=>{
     array.find({},'id username',(err, docs) =>{
-		
 	   res.send(docs);
     });
 });
 
 
 app.get('/api/exercise/log',(req,res)=>{
-   array.findById({_id:req.query.id},(err,data)=>{
-	  array.find( 
-  {date: {$gte: new Date(req.query.start), $lt: new Date(req.query.end)}})
-  }).limit(req.query.limit).then(data =>{
-	  if(req.query.start === undefined && req.query.end === undefined && req.query.limit === undefined && req.query.id !== undefined){
-		let myLength = data.description.length;
-		return res.send({
-		       count:myLength,
-		       username:data.username,
-			   _id:data._id,
-			   data:[
-                {   
-                 description:data.description,
-                 duration:data.duration
-                 }
-				     ]
-	           })
+ array.findById({_id:req.query.id},(err,data)=>{
+		let iniate = new Date(req.query.start);
+				 let one = moment(iniate).format("YYYY-MM-DDT00:00:00.000") + "Z";
+				 let date1 = new Date(one);
+				 console.log(date1);
+				 console.log(typeof(date1));
+	let iniate1 = new Date(req.query.end);
+				 let two = moment(iniate1).format("YYYY-MM-DDT00:00:00.000") + "Z";
+				 let date2 = new Date(two);
+				 console.log(date2)
+				 console.log(typeof(date2))	
+  let myLength;
+	   if(req.query.start === undefined && req.query.end === undefined && req.query.limit === undefined && req.query.id !== undefined){
+		 myLength = data.data.length;
+		array.aggregate([
+    { $match: {_id: req.query.id}}]).then(data =>{
+		res.send({count:myLength,data})
+	})
 	  }
-	  let items; 	  
-	  let myLength = data.description.length;
-	  let item = data.description
-	  let time = data.duration;
-	  let timeperiod;
-	  if(item.length >= req.query.limit && time.length >= req.query.limit&& myLength !== req.query.limit){
-	  items = item.slice(0,req.query.limit);
-      timeperiod = time.slice(0,req.query.limit); 
-      myLength = Number(req.query.limit);	  
-	  }else{
+	  else if(req.query.start !== undefined && req.query.end !== undefined && req.query.limit !== undefined && req.query.id !== undefined){
+	  array.aggregate([
+    { $match: {_id: req.query.id}},
+    { $unwind: '$data'},{$match : {"$and" :  [{"data.date" :{$gte : date1} },
+    {"data.date" :{"$lte" : date2}}]}}]).limit(Number(req.query.limit)).then(data =>{
+		if(data.length >= Number(req.query.limit)){
+		res.send(data)
+		}else{
 		return  res.send({error:"Document do not match limit requested"})
 	  }
-	 res.send(
-	         {
-		       count:myLength,
-		       username:data.username,
-			   _id:data._id,
-			   data:[
-                {   
-                 description:items,
-                 duration:timeperiod,
-                 dateSearchStarted:req.query.start,
-				 dateSearchEnded:req.query.end
-                 }
-				     ]
-	           }
-			  ); 
-  }).catch(err =>{
-	  if(err)throw err;
-  }) 
-  
+	})
+	  }
+	 })
 })
 
 app.use('*',(req, res, next)=> {
@@ -194,5 +199,3 @@ app.listen(port,function(){
     console.log('I am working fine!');
 })
 
-//https://happycoder.herokuapp.com	
-//https://devcenter.heroku.com/changelog-items/1530
