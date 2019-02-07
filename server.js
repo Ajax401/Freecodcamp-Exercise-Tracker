@@ -149,10 +149,13 @@ app.get('/api/exercise/users',(req, res)=>{
     });
 });
 
-
 app.get('/api/exercise/log',(req,res)=>{
- array.findById({_id:req.query.id},(err,data)=>{
-		let iniate = new Date(req.query.start);
+	let myLength;
+	array.countDocuments({_id:req.query.id},(err, count,data)=>{
+	if(count>0){
+	array.findById({_id:req.query.id},(err,data)=>{	 
+
+let iniate = new Date(req.query.start);
 				 let one = moment(iniate).format("YYYY-MM-DDT00:00:00.000") + "Z";
 				 let date1 = new Date(one);
 				 console.log(date1);
@@ -163,17 +166,19 @@ app.get('/api/exercise/log',(req,res)=>{
 				 console.log(date2)
 				 console.log(typeof(date2))	
   let myLength;
-	   if(req.query.start === undefined && req.query.end === undefined && req.query.limit === undefined && req.query.id !== undefined){
+  if(req.query.start === undefined && req.query.end === undefined && req.query.limit === undefined && req.query.id !== undefined){
 		 myLength = data.data.length;
+		 
 		array.aggregate([
     { $match: {_id: req.query.id}}]).then(data =>{
-		res.send({count:myLength,data})
+        res.send({count:myLength,data})
+		
 	})
-	  }
-	  else if(req.query.start !== undefined && req.query.end !== undefined && req.query.limit !== undefined && req.query.id !== undefined){
+	
+	  } else if(req.query.start !== undefined && req.query.end !== undefined && req.query.limit !== undefined && req.query.id !== undefined){
 	  array.aggregate([
     { $match: {_id: req.query.id}},
-    { $unwind: '$data'},{$match : {"$and" :  [{"data.date" :{$gte : date1} },
+    { $unwind: '$data'},{$match : {"$and" :  [{"data.date" :{"$gte" : date1} },
     {"data.date" :{"$lte" : date2}}]}}]).limit(Number(req.query.limit)).then(data =>{
 		if(data.length >= Number(req.query.limit)){
 		res.send(data)
@@ -182,7 +187,14 @@ app.get('/api/exercise/log',(req,res)=>{
 	  }
 	})
 	  }
-	 })
+
+})
+	}else{
+			  res.send({_id:"Please type correct id from datbase"})
+		  }
+	})
+
+
 })
 
 app.use('*',(req, res, next)=> {
