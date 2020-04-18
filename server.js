@@ -183,7 +183,7 @@ let iniate = new Date(req.query.start);
 		if(data.length >= Number(req.query.limit)){
 		res.send(data)
 		}else{
-		return  res.send({error:"Document do not match limit requested"})
+		return  res.send({error:"Document did not match limit requested"})
 	  }
 	})
 	  }
