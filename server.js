@@ -79,8 +79,8 @@ app.post('/api/exercise/add',(req,res)=>{
 		if(testing.test(myTest) === true && myTest !== ""){
 			if(myNum.test(checking)=== true){
 				let inPutDate;
-		        let timestamp;
-		        let d;
+		                let timestamp;
+		                let d;
 			 if(Object.keys(req.body.user.userDate).length === 0){
 				 let date1 = Date.now();
 		         date1 = new Date(date1);
@@ -114,11 +114,11 @@ app.post('/api/exercise/add',(req,res)=>{
 				   inPutDate = new Date(inPutDate).toDateString();
 				   console.log(data)
 				   res.send({ 
-		           username:data.username,
-		           date:inPutDate,
-		           description:req.body.user.userTask,
-			       duration:Number(req.body.user.userDuration),
-			       _id:req.body.user.userId
+		                       username:data.username,
+		                       date:inPutDate,
+		                       description:req.body.user.userTask,
+			               duration:Number(req.body.user.userDuration),
+			               _id:req.body.user.userId
 				   })
 				}).catch(err => {
  
@@ -132,15 +132,15 @@ app.post('/api/exercise/add',(req,res)=>{
 		  
 			 }
 				}else{
-		res.send({duration:"Please type a number value"})
-	}	
-			}else{
-		res.send({description:"Invalid description! Please enter a string of letters for description."})  
-	  }
-		}else{
-			  res.send({_id:"Please type correct id from datbase"})
-		  }
-	}); 	
+		                     res.send({duration:"Please type a number value"})
+	                             }	
+			  }else{
+		             res.send({description:"Invalid description! Please enter a string of letters for description."})  
+	                     }
+		              }else{
+			           res.send({_id:"Please type correct id from datbase"})
+		                   }
+   }); 	
 })
 
 app.get('/api/exercise/users',(req, res)=>{
