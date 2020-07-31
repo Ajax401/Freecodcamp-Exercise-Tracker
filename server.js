@@ -1,5 +1,6 @@
 const express = require("express");
 const port = process.env.PORT || 3000;
+const helmet = require('helmet');
 const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -16,6 +17,8 @@ mongoose.connect(process.env.MONGO_URI||'mongodb://localhost/arrays',{ useNewUrl
 });
 
 const array = require('./models/test1.js');
+
+app.use(helmet())
 
 app.use(bodyParser.json());
 app.use(cors());
